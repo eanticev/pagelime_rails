@@ -1,22 +1,16 @@
 # Pagelime
-require "routing"
 
-%w{ models controllers helpers }.each do |dir|
-  path = File.join(File.dirname(__FILE__), 'app', dir)
-  $LOAD_PATH << path
-  ActiveSupport::Dependencies.load_paths << path
-  ActiveSupport::Dependencies.load_once_paths.delete(path)
+def pagelime_environment_configured?
+  ENV['PAGELIME_ACCOUNT_KEY'] != nil &&
+  ENV['PAGELIME_ACCOUNT_SECRET'] != nil &&
+  ENV['PAGELIME_HEROKU_API_VERSION']
 end
-
-# wire helper
-require "app/helpers/pagelime_helper" 
-ActionView::Base.send :include, PagelimeHelper
 
 def fetch_cms_xml(page_path)
 
 	page_key = Base64.encode64(page_path)
 	xml_content = Rails.cache.fetch("cms:#{page_key}", :expires_in => 15.days) do
-	  puts "NO CACHE... loading xml"
+	  puts "PAGELIME CMS PLUGIN: NO CACHE... loading xml"
 		# set input values
 		api_dest = "http://localhost:4834"
 		key = ENV['PAGELIME_ACCOUNT_KEY']
@@ -28,7 +22,7 @@ def fetch_cms_xml(page_path)
 		signature = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',secret,req)}")
 		headers = {'Signature' => signature}
 		
-		puts "SIGNATURE:" + signature
+		puts "PAGELIME CMS PLUGIN: SIGNATURE:" + signature
 	
 		# get the url that we need to post to
 		http = Net::HTTP::new('localhost',4834)
@@ -49,6 +43,11 @@ end
 
 def cms_process_html_block(page_path=nil, html="")
 
+    unless pagelime_environment_configured?
+      puts "PAGELIME CMS PLUGIN: Environment variables not configured"
+      return html
+    end
+
     # use nokogiri to replace contents
     doc = Nokogiri::HTML::DocumentFragment.parse(html) 
     doc.css("div.cms-editable").each do |div| 
@@ -59,15 +58,15 @@ def cms_process_html_block(page_path=nil, html="")
 		# Load pagelime content
 		xml_content = fetch_cms_xml(page_path)
 		
-		puts "parsing xml"
+		puts "PAGELIME CMS PLUGIN: parsing xml"
 		soap = Nokogiri::XML::Document.parse(xml_content)
-		puts "looking for region: #{client_id}"
+		puts "PAGELIME CMS PLUGIN: looking for region: #{client_id}"
 		xpathNodes = soap.css("EditableRegion[@ElementID=\"#{client_id}\"]")
 		puts "regions found: #{xpathNodes.count}"
 		if (xpathNodes.count > 0)
 			new_content = xpathNodes[0].css("Html")[0].content()
 			
-			puts "NEW CONTENT:"
+			puts "PAGELIME CMS PLUGIN: NEW CONTENT:"
 			puts new_content
 			
 			if (new_content)
@@ -101,4 +100,29 @@ module PagelimeControllerExtensions
 
 end
 
-ActionController::Base.extend PagelimeControllerExtensions
+def initialize_pagelime_plugin
+  
+  puts "PAGELIME CMS PLUGIN: initializing"
+  
+  # add dependencies to load paths
+  %w{ models controllers helpers }.each do |dir|
+    path = File.join(File.dirname(__FILE__), 'app', dir)
+    $LOAD_PATH << path
+    
+    if Rails::VERSION::MAJOR == 2
+      ActiveSupport::Dependencies.load_paths << path
+      ActiveSupport::Dependencies.load_once_paths.delete(path)
+    elsif Rails::VERSION::MAJOR == 3
+      ActiveSupport::Dependencies.autoload_paths << path
+      ActiveSupport::Dependencies.autoload_once_paths.delete(path)
+    end
+  end
+  
+  # wire controller extensions
+  ActionController::Base.extend PagelimeControllerExtensions
+  
+  # wire helper
+  require "app/helpers/pagelime_helper" 
+  ActionView::Base.send :include, PagelimeHelper
+  
+end

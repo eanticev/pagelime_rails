@@ -8,4 +8,6 @@ module Pagelime #:nodoc:
   end
 end
 
-ActionController::Routing::RouteSet::Mapper.send :include, Pagelime::Routing::MapperExtensions
+if Rails::VERSION::MAJOR == 2
+  ActionController::Routing::RouteSet::Mapper.send :include, Pagelime::Routing::MapperExtensions
+end

@@ -1,5 +1,8 @@
 # Pagelime
 
+require "config/routes"
+require "routing_extensions"
+
 def pagelime_environment_configured?
   ENV['PAGELIME_ACCOUNT_KEY'] != nil &&
   ENV['PAGELIME_ACCOUNT_SECRET'] != nil &&
@@ -12,7 +15,6 @@ def fetch_cms_xml(page_path)
 	xml_content = Rails.cache.fetch("cms:#{page_key}", :expires_in => 15.days) do
 	  puts "PAGELIME CMS PLUGIN: NO CACHE... loading xml"
 		# set input values
-		api_dest = "http://localhost:4834"
 		key = ENV['PAGELIME_ACCOUNT_KEY']
 		secret = ENV['PAGELIME_ACCOUNT_SECRET']
 		api_version = ENV['PAGELIME_HEROKU_API_VERSION']
@@ -25,7 +27,8 @@ def fetch_cms_xml(page_path)
 		puts "PAGELIME CMS PLUGIN: SIGNATURE:" + signature
 	
 		# get the url that we need to post to
-		http = Net::HTTP::new('localhost',4834)
+		http = Net::HTTP::new('qa.cms.pagelime.com',80)
+		
 		# send the request
 		response = http.request_post("/api/heroku/#{api_version}/content.asmx/PageContent", req, headers)
 
@@ -43,41 +46,56 @@ end
 
 def cms_process_html_block(page_path=nil, html="")
 
-    unless pagelime_environment_configured?
-      puts "PAGELIME CMS PLUGIN: Environment variables not configured"
+    begin
+
+      unless pagelime_environment_configured?
+        puts "PAGELIME CMS PLUGIN: Environment variables not configured"
+        return html
+      end
+  
+      # use nokogiri to replace contents
+      doc = Nokogiri::HTML::DocumentFragment.parse(html) 
+      doc.css("div.cms-editable").each do |div| 
+        
+  		# Grab client ID
+  		client_id = div["id"]
+  
+  		# Load pagelime content
+  		xml_content = fetch_cms_xml(page_path)
+  		
+  		puts "PAGELIME CMS PLUGIN: parsing xml"
+  		soap = Nokogiri::XML::Document.parse(xml_content)
+  		puts "PAGELIME CMS PLUGIN: looking for region: #{client_id}"
+  		xpathNodes = soap.css("EditableRegion[@ElementID=\"#{client_id}\"]")
+  		puts "regions found: #{xpathNodes.count}"
+  		if (xpathNodes.count > 0)
+  			new_content = xpathNodes[0].css("Html")[0].content()
+  			
+  			puts "PAGELIME CMS PLUGIN: NEW CONTENT:"
+  			puts new_content
+  			
+  			if (new_content)
+  				# div.content = "Replaced content"
+  				div.replace new_content
+  			end
+  		end
+        
+      end
+      
+      return doc.to_html
+    
+    rescue
+      
+      # error
+      puts "PAGELIME CMS PLUGIN: Error rendering block"
+      
+      # comment below to disable debug
+      raise
+      
       return html
-    end
-
-    # use nokogiri to replace contents
-    doc = Nokogiri::HTML::DocumentFragment.parse(html) 
-    doc.css("div.cms-editable").each do |div| 
-      
-		# Grab client ID
-		client_id = div["id"]
-
-		# Load pagelime content
-		xml_content = fetch_cms_xml(page_path)
-		
-		puts "PAGELIME CMS PLUGIN: parsing xml"
-		soap = Nokogiri::XML::Document.parse(xml_content)
-		puts "PAGELIME CMS PLUGIN: looking for region: #{client_id}"
-		xpathNodes = soap.css("EditableRegion[@ElementID=\"#{client_id}\"]")
-		puts "regions found: #{xpathNodes.count}"
-		if (xpathNodes.count > 0)
-			new_content = xpathNodes[0].css("Html")[0].content()
-			
-			puts "PAGELIME CMS PLUGIN: NEW CONTENT:"
-			puts new_content
-			
-			if (new_content)
-				# div.content = "Replaced content"
-				div.replace new_content
-			end
-		end
       
     end
-	
-	return doc.to_html
+	  
 end
 
 module PagelimeControllerExtensions
@@ -89,12 +107,16 @@ module PagelimeControllerExtensions
 
 	module InstanceMethods
 		def cms_process_rendered_body
-			# response contents loaded into a variable
-			input_content = response.body
-			page_path = request.path
-			html = cms_process_html_block(page_path,input_content)
-			# output the final content
-			response.body = html
+		  if pagelime_environment_configured?
+  			# response contents loaded into a variable
+  			input_content = response.body
+  			page_path = request.path
+  			html = cms_process_html_block(page_path,input_content)
+  			# output the final content
+  			response.body = html
+			else
+        puts "PAGELIME CMS PLUGIN: Environment variables not configured"
+      end
 		end
 	end
 

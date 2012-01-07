@@ -5,13 +5,20 @@ class PagelimeReceiverController < ApplicationController
   end
   
   def after_publish_callback
-	page_key = Base64.encode64(params[:path])
-	Rails.cache.delete("cms:#{page_key}")
-	begin
-		new_content = fetch_cms_xml(params[:path]);
-	rescue
-	end
-	render :inline => "cache cleared", :status => 200
+    
+  	page_key = Base64.encode64(params[:path])
+
+# don't do the prefetch below, as the page isn't done publishing (mySQL transaction hasn't completed) at the point when this gets called  	
+=begin
+  	Rails.cache.delete("cms:#{page_key}")
+  	begin
+  		new_content = fetch_cms_xml(params[:path]);
+  	rescue
+  	end
+=end
+  	
+  	render :inline => "cache cleared", :status => 200
+  	
   end
   
   def after_publish_callback_old

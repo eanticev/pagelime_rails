@@ -107,6 +107,7 @@ module PagelimeControllerExtensions
 
 	module InstanceMethods
 		def cms_process_rendered_body
+      puts "PAGELIME CMS PLUGIN: Processing response body"
 		  if pagelime_environment_configured?
   			# response contents loaded into a variable
   			input_content = response.body

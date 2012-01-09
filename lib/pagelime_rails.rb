@@ -3,6 +3,8 @@
 require "config/routes"
 require "routing_extensions"
 
+puts "PAGELIME CMS PLUGIN: included"
+    
 if Rails::VERSION::MAJOR == 2
   initialize_pagelime_plugin
 elsif Rails::VERSION::MAJOR == 3

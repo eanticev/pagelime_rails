@@ -4,19 +4,10 @@ puts "PAGELIME CMS PLUGIN: included"
     
 if Rails::VERSION::MAJOR == 2
   require "routing_extensions"
+  require "../config/routes.rb"
   initialize_pagelime_plugin
 elsif Rails::VERSION::MAJOR == 3
   require "engine"
-=begin
-  module Pagelime
-    class Railtie < Rails::Railtie
-      railtie_name :pagelime
-      initializer "pagelime.initialize" do |app|
-        initialize_pagelime_plugin
-      end
-    end
-  end
-=end
 end
 
 def pagelime_environment_configured?

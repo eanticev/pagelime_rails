@@ -9,10 +9,8 @@ if Rails::VERSION::MAJOR == 2
 elsif Rails::VERSION::MAJOR == 3
 
   Rails.application.routes.draw do
-    
     puts "PAGELIME CMS PLUGIN: setting up rails 3 routes"
     match 'pagelime/:action' => 'pagelime_receiver'
-    
   end
-  
+
 end

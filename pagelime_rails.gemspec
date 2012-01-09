@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
     "lib/pagelime_rails.rb",
     "lib/routing_extensions.rb",
     "lib/tasks/pagelime.rake",
+    "pagelime_rails.gemspec",
     "rails/init.rb",
     "test/pagelime_test.rb",
     "test/test_helper.rb",

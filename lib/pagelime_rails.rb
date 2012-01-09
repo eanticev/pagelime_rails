@@ -3,6 +3,25 @@
 require "config/routes"
 require "routing_extensions"
 
+if Rails::VERSION::MAJOR == 2
+  initialize_pagelime_plugin
+elsif Rails::VERSION::MAJOR == 3
+  module Pagelime
+    class Railtie < Rails::Railtie
+      railtie_name :pagelime
+      initializer "pagelime.initialize" do |app|
+        initialize_pagelime_plugin
+      end
+    end
+=begin
+    class Engine < Rails::Engine
+      engine_name :pagelime
+      paths.config.routes = 'lib/config/routes.rb'
+    end
+=end
+  end
+end
+
 def pagelime_environment_configured?
   ENV['PAGELIME_ACCOUNT_KEY'] != nil &&
   ENV['PAGELIME_ACCOUNT_SECRET'] != nil &&

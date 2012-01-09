@@ -28,7 +28,6 @@ elsif Rails::VERSION::MAJOR == 3
       mount Pagelime::Engine => "/"
     end
     
-    
   end
   
 end

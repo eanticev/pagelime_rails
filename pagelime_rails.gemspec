@@ -5,21 +5,19 @@
 
 Gem::Specification.new do |s|
   s.name = %q{pagelime_rails}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Emil Anticevic"]
   s.date = %q{2012-01-09}
   s.description = %q{}
   s.email = %q{eanticev@gmail.com}
-  s.extra_rdoc_files = [
-    "README"
-  ]
   s.files = [
     "Gemfile",
+    "Heroku.md",
     "MIT-LICENSE",
-    "README",
     "Rakefile",
+    "Readme.md",
     "VERSION",
     "config/routes.rb",
     "init.rb",

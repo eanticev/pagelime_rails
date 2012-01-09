@@ -7,15 +7,28 @@ if Rails::VERSION::MAJOR == 2
   end
 
 elsif Rails::VERSION::MAJOR == 3
+  
+  if Rails::VERSION::MINOR == 0
 
-  puts "PAGELIME CMS PLUGIN: setting up rails 3 routes"
+    puts "PAGELIME CMS PLUGIN: setting up rails 3 routes"
     
-  Pagelime::Engine.routes.draw do
-    match 'pagelime/:action' => 'pagelime_receiver'
-  end
-
-  Rails.application.routes.draw do
-    mount Pagelime::Engine => "/"
+    Rails.application.routes.draw do
+      match 'pagelime/:action' => 'pagelime_receiver'
+    end
+    
+  else
+    
+    puts "PAGELIME CMS PLUGIN: setting up rails 3.1 routes"
+    
+    Pagelime::Engine.routes.draw do
+      match 'pagelime/:action' => 'pagelime_receiver'
+    end
+  
+    Rails.application.routes.draw do
+      mount Pagelime::Engine => "/"
+    end
+    
+    
   end
   
 end

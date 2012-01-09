@@ -1,14 +1,6 @@
 # Pagelime
 
 puts "PAGELIME CMS PLUGIN: included"
-    
-if Rails::VERSION::MAJOR == 2
-  require "routing_extensions"
-  require "../config/routes.rb"
-  initialize_pagelime_plugin
-elsif Rails::VERSION::MAJOR == 3
-  require "engine"
-end
 
 def pagelime_environment_configured?
   ENV['PAGELIME_ACCOUNT_KEY'] != nil &&
@@ -155,4 +147,14 @@ def initialize_pagelime_plugin
   require "app/helpers/pagelime_helper" 
   ActionView::Base.send :include, PagelimeHelper
   
+end
+
+# start plugin 
+if Rails::VERSION::MAJOR == 2
+  require "routing_extensions"
+  # below is not needed in Rails 2 as you can use the map.cms_routes from the routing_extensions
+  # require File.join(File.dirname(__FILE__), "/../config/routes.rb")
+  initialize_pagelime_plugin
+elsif Rails::VERSION::MAJOR == 3
+  require "engine"
 end

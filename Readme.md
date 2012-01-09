@@ -74,8 +74,8 @@ Create some editable regions in your views like so:
 ### Step 6. (OPTIONAL)
 If you don't want to have your entire controller CMS editable for some reason, you can sorround areas in your view with a code block like so:
 
-<% cms_content do %>
-	<div id="my_content" class="cms-editable">hello world</div>
-<% end %>
+	<% cms_content do %>
+		<div id="my_content" class="cms-editable">hello world</div>
+	<% end %>
 
 Copyright (c) 2011 Pagelime LLC, released under the MIT license

@@ -8,6 +8,7 @@ class PagelimeReceiverController < ApplicationController
     
   	page_key = Base64.encode64(params[:path])
     Rails.cache.delete("cms:#{page_key}")
+    Rails.cache.delete("cms:shared")
 
 # don't do the prefetch below, as the page isn't done publishing (mySQL transaction hasn't completed) at the point when this gets called  	
 =begin

@@ -8,44 +8,89 @@ def pagelime_environment_configured?
   ENV['PAGELIME_HEROKU_API_VERSION']
 end
 
-def fetch_cms_xml(page_path)
+def cms_api_signature(req)
+  secret = ENV['PAGELIME_ACCOUNT_SECRET']
+  signature = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',secret,req)}")
+  return signature
+end
 
-	page_key = Base64.encode64(page_path)
-	xml_content = Rails.cache.fetch("cms:#{page_key}", :expires_in => 15.days) do
-	  puts "PAGELIME CMS PLUGIN: NO CACHE... loading xml"
-		# set input values
-		key = ENV['PAGELIME_ACCOUNT_KEY']
-		secret = ENV['PAGELIME_ACCOUNT_SECRET']
-		api_version = ENV['PAGELIME_HEROKU_API_VERSION']
-		req = "apiKey=#{key}&path=#{CGI.escape(page_path)}"
-		
-		# generate API signature
-		signature = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',secret,req)}")
-		headers = {'Signature' => signature}
-		
-		puts "PAGELIME CMS PLUGIN: SIGNATURE:" + signature
-	
-		# get the url that we need to post to
-		http = Net::HTTP::new('qa.cms.pagelime.com',80)
-		
-		# send the request
-		response = http.request_post("/api/heroku/#{api_version}/content.asmx/PageContent", req, headers)
+def fetch_cms_shared_xml
+  xml_content = Rails.cache.fetch("cms:shared", :expires_in => 1.year) do
+    puts "PAGELIME CMS PLUGIN: NO SHARED CACHE... loading xml"
+    # set input values
+    key = ENV['PAGELIME_ACCOUNT_KEY']
+    
+    # get the url that we need to post to
+    http = Net::HTTP::new('s3.amazonaws.com',80)
+    
+    # send the request
+    response = http.get("/cms_assets_qa/heroku/#{key}/shared-regions.xml")
+    
+    # puts "PAGELIME CMS PLUGIN: response XML: #{response.body}"
+    
+    xml_content = response.body
+    
+    xml_content
+  end
+  
+  return xml_content
+  
+end
 
-		# cache the file
-		# File.open("#{Rails.root}/tmp/test.cms", 'w') {|f| f.write(response.body) }
-		
-		xml_content = response.body
-		
-		xml_content
-	end
-	
-	return xml_content
-	
+def fetch_cms_xml(page_path, element_ids)
+
+  page_key = Base64.encode64(page_path)
+  xml_content = Rails.cache.fetch("cms:#{page_key}", :expires_in => 1.year) do
+    puts "PAGELIME CMS PLUGIN: NO '#{page_path}' CACHE... loading xml"
+    # set input values
+    key = ENV['PAGELIME_ACCOUNT_KEY']
+    
+    # get the url that we need to post to
+    http = Net::HTTP::new('s3.amazonaws.com',80)
+    
+    response = http.get("/cms_assets_qa/heroku/#{key}/pages#{page_path}.xml")
+    
+    # puts "PAGELIME CMS PLUGIN: response XML: #{response.body}"
+    
+    xml_content = response.body
+    
+    xml_content
+  end
+  
+  return xml_content
+  
+end
+
+def cms_process_html_block_regions(editable_regions, xml_content)
+
+    editable_regions.each do |div| 
+    
+    # Grab client ID
+    client_id = div["id"]
+    
+    puts "PAGELIME CMS PLUGIN: parsing xml"
+    soap = Nokogiri::XML::Document.parse(xml_content)
+    puts "PAGELIME CMS PLUGIN: looking for region: #{client_id}"
+    xpathNodes = soap.css("EditableRegion[@ElementID=\"#{client_id}\"]")
+    puts "regions found: #{xpathNodes.count}"
+    if (xpathNodes.count > 0)
+      new_content = xpathNodes[0].css("Html")[0].content()
+      
+      puts "PAGELIME CMS PLUGIN: NEW CONTENT:"
+      puts new_content
+      
+      if (new_content)
+        # div.content = "Replaced content"
+        div.replace new_content
+      end
+    end
+    
+    end
+
 end
 
 def cms_process_html_block(page_path=nil, html="")
 
-    begin
 
       unless pagelime_environment_configured?
         puts "PAGELIME CMS PLUGIN: Environment variables not configured"
@@ -54,71 +99,44 @@ def cms_process_html_block(page_path=nil, html="")
   
       # use nokogiri to replace contents
       doc = Nokogiri::HTML::DocumentFragment.parse(html) 
-      doc.css("div.cms-editable").each do |div| 
-        
-  		# Grab client ID
-  		client_id = div["id"]
-  
-  		# Load pagelime content
-  		xml_content = fetch_cms_xml(page_path)
-  		
-  		puts "PAGELIME CMS PLUGIN: parsing xml"
-  		soap = Nokogiri::XML::Document.parse(xml_content)
-  		puts "PAGELIME CMS PLUGIN: looking for region: #{client_id}"
-  		xpathNodes = soap.css("EditableRegion[@ElementID=\"#{client_id}\"]")
-  		puts "regions found: #{xpathNodes.count}"
-  		if (xpathNodes.count > 0)
-  			new_content = xpathNodes[0].css("Html")[0].content()
-  			
-  			puts "PAGELIME CMS PLUGIN: NEW CONTENT:"
-  			puts new_content
-  			
-  			if (new_content)
-  				# div.content = "Replaced content"
-  				div.replace new_content
-  			end
-  		end
-        
-      end
+    editable_regions = doc.css(".cms-editable")
+    shared_regions = doc.css(".cms-shared")
+    
+    region_client_ids = Array.new
+      
+    editable_regions.each do |div| 
+    region_client_ids.push div["id"]
+    end
+    
+    cms_process_html_block_regions(editable_regions, fetch_cms_xml(page_path,region_client_ids))
+    cms_process_html_block_regions(shared_regions,fetch_cms_shared_xml())
       
       return doc.to_html
     
-    rescue
-      
-      # error
-      puts "PAGELIME CMS PLUGIN: Error rendering block"
-      
-      # comment below to disable debug
-      raise
-      
-      return html
-      
-    end
-	  
 end
 
 module PagelimeControllerExtensions
 
-	def acts_as_cms_editable(opts=Hash.new)
-		after_filter :cms_process_rendered_body, :except => opts[:except]
-		include InstanceMethods
-	end
+  def acts_as_cms_editable(opts=Hash.new)
+    after_filter :cms_process_rendered_body, :except => opts[:except]
+    include InstanceMethods
+  end
 
-	module InstanceMethods
-		def cms_process_rendered_body
+  module InstanceMethods
+    def cms_process_rendered_body
       puts "PAGELIME CMS PLUGIN: Processing response body"
-		  if pagelime_environment_configured?
-  			# response contents loaded into a variable
-  			input_content = response.body
-  			page_path = request.path
-  			html = cms_process_html_block(page_path,input_content)
-  			# output the final content
-  			response.body = html
-			else
-        puts "PAGELIME CMS PLUGIN: Environment variables not configured"
+      if pagelime_environment_configured?
+        # response contents loaded into a variable
+        input_content = response.body
+        page_path = request.path
+        html = cms_process_html_block(page_path,input_content)
+        # output the final content
+        response.body = html
+      else
+      puts "PAGELIME CMS PLUGIN: Environment variables not configured"
       end
-		end
-	end
+    end
+  end
 
 end
 

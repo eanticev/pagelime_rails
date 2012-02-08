@@ -8,6 +8,11 @@ Pagelime is a simple CMS service that allows you to define editable regions in y
 In your views, make any element editable just by adding a CSS class:
 `<div id="my_content" class="cms-editable">This content is now editable in Pagelime... no code... no databases... no fuss</div>`
 
+Installing the Addon
+---------------
+
+Run `heroku addons:add pagelime` from the command line. After setup, to access the CMS, find the menu item labeled "Pagelime" will appear under the addons dropdown for your app. 
+
 Getting Started
 ---------------
 
@@ -63,6 +68,11 @@ Create some editable regions in your views like so:
 
 *The ID and the class are required for the CMS to work*
 
+If you want to add an editable area that is shared across multiple views (such as a partial, or your layout), use the following format:
+
+`<div id="my_content" class="cms-editable cms-shared">this is now editable and shared</div>`
+
+
 ### Step 5. (OPTIONAL)
 If you don't want to have your entire controller CMS editable for some reason, you can sorround areas in your view with a code block like so:
 
@@ -74,6 +84,11 @@ If you don't want to have your entire controller CMS editable for some reason, y
 Add the pagelime addon to your app from the command line:
 
 `heroku addons:add pagelime`
+
+
+Accessing the CMS
+---------------
+To access the CMS, find the menu item labeled "Pagelime" will appear under the addons dropdown for your app.
 
 How it works under the hood
 ---------------------------

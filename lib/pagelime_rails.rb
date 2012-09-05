@@ -24,7 +24,7 @@ def fetch_cms_shared_xml
     http = Net::HTTP::new('s3.amazonaws.com',80)
     
     # send the request
-    response = http.get("/cms_assets_qa/heroku/#{key}/shared-regions.xml")
+    response = http.get("/cms_assets/heroku/#{key}/shared-regions.xml")
     
     # puts "PAGELIME CMS PLUGIN: response XML: #{response.body}"
     
@@ -48,7 +48,7 @@ def fetch_cms_xml(page_path, element_ids)
     # get the url that we need to post to
     http = Net::HTTP::new('s3.amazonaws.com',80)
     
-    response = http.get("/cms_assets_qa/heroku/#{key}/pages#{page_path}.xml")
+    response = http.get("/cms_assets/heroku/#{key}/pages#{page_path}.xml")
     
     # puts "PAGELIME CMS PLUGIN: response XML: #{response.body}"
     

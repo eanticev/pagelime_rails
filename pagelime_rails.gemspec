@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{pagelime_rails}
+  s.name = "pagelime_rails"
   s.version = "0.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Emil Anticevic"]
-  s.date = %q{2012-09-05}
-  s.description = %q{}
-  s.email = %q{eanticev@gmail.com}
+  s.date = "2012-09-05"
+  s.description = ""
+  s.email = "eanticev@gmail.com"
   s.files = [
     "Gemfile",
     "Heroku.md",
@@ -34,14 +34,13 @@ Gem::Specification.new do |s|
     "test/test_helper.rb",
     "uninstall.rb"
   ]
-  s.homepage = %q{http://github.com/eanticev/pagelime_rails}
+  s.homepage = "http://github.com/eanticev/pagelime_rails"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
-  s.summary = %q{Pagelime Rails Plugin}
+  s.rubygems_version = "1.8.24"
+  s.summary = "Pagelime Rails Plugin"
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then

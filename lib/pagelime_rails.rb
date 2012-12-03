@@ -89,16 +89,16 @@ def cms_process_html_block_regions(editable_regions, xml_content)
 
 end
 
-def cms_process_html_block(page_path=nil, html="")
+def cms_process_html_block(page_path=nil, html="",fragment=true)
 
 
-      unless pagelime_environment_configured?
-        puts "PAGELIME CMS PLUGIN: Environment variables not configured"
-        return html
-      end
+    unless pagelime_environment_configured?
+      puts "PAGELIME CMS PLUGIN: Environment variables not configured"
+      return html
+    end
   
-      # use nokogiri to replace contents
-      doc = Nokogiri::HTML::DocumentFragment.parse(html) 
+    # use nokogiri to replace contents
+    doc = fragment ? Nokogiri::HTML::DocumentFragment.parse(html) : Nokogiri::HTML::Document.parse(html) 
     editable_regions = doc.css(".cms-editable")
     shared_regions = doc.css(".cms-shared")
     
@@ -111,7 +111,7 @@ def cms_process_html_block(page_path=nil, html="")
     cms_process_html_block_regions(editable_regions, fetch_cms_xml(page_path,region_client_ids))
     cms_process_html_block_regions(shared_regions,fetch_cms_shared_xml())
       
-      return doc.to_html
+    return doc.to_html
     
 end
 
@@ -129,11 +129,11 @@ module PagelimeControllerExtensions
         # response contents loaded into a variable
         input_content = response.body
         page_path = request.path
-        html = cms_process_html_block(page_path,input_content)
+        html = cms_process_html_block(page_path,input_content,false)
         # output the final content
         response.body = html
       else
-      puts "PAGELIME CMS PLUGIN: Environment variables not configured"
+        puts "PAGELIME CMS PLUGIN: Environment variables not configured"
       end
     end
   end

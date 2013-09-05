@@ -23,7 +23,7 @@ Jeweler::Tasks.new do |gem|
   gem.summary = "Pagelime Rails Plugin"
   gem.description = ""
   gem.email = "eanticev@gmail.com"
-  gem.authors = ["Emil Anticevic"]
+  gem.authors = ["Emil Anticevic", "Joel Van Horn"]
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
@@ -35,17 +35,9 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
-end
-
 task :default => :test
 
-require 'rake/rdoctask'
+require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 

@@ -1,0 +1,1 @@
+require 'pagelime/rails'

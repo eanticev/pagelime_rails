@@ -7,7 +7,7 @@ class PagelimeReceiverController < ApplicationController
   def after_publish_callback
     
     Pagelime.client.clear params[:path]
-    Pagelime.clinet.clear_shared
+    Pagelime.client.clear_shared
 
 # don't do the prefetch below, as the page isn't done publishing (mySQL transaction hasn't completed) at the point when this gets called  	
 =begin

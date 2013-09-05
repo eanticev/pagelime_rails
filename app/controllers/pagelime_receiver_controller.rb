@@ -6,9 +6,8 @@ class PagelimeReceiverController < ApplicationController
   
   def after_publish_callback
     
-  	page_key = Base64.encode64(params[:path])
-    Rails.cache.delete("cms:#{page_key}")
-    Rails.cache.delete("cms:shared")
+    Pagelime.client.clear params[:path]
+    Pagelime.clinet.clear_shared
 
 # don't do the prefetch below, as the page isn't done publishing (mySQL transaction hasn't completed) at the point when this gets called  	
 =begin

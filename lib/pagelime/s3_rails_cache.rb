@@ -1,5 +1,5 @@
 module Pagelime
-  class S3RailsCache < Pagelime::S3Client
+  class S3RailsCache < S3Client
     module ClassMethods
       def generate_cache_key(page_path, format = default_format)
         "pagelime:cms:#{format}:page:#{Base64.encode64(page_path)}"

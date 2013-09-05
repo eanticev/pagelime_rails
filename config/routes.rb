@@ -18,12 +18,12 @@ elsif Rails::VERSION::MAJOR >= 3
   
   puts "PAGELIME CMS PLUGIN: setting up rails 3.1 routes"
   
-  Pagelime::Engine.routes.draw do
-    match 'pagelime/:action' => 'pagelime_receiver'
+  Pagelime::Rails::Engine.routes.draw do
+    get 'pagelime/:action' => 'pagelime_receiver'
   end
 
   Rails.application.routes.draw do
-    mount Pagelime::Engine => "/"
+    mount Pagelime::Rails::Engine => "/"
   end
   
 end

@@ -1,2 +1,2 @@
 # Include hook code here
-require "pagelime"
+require 'pagelime-rails'

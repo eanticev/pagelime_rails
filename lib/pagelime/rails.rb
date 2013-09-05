@@ -1,20 +1,38 @@
-require_relative 'rails/initializer'
-require_relative 's3_rails_cache'
-
-puts "PAGELIME CMS PLUGIN: included"
-
-Pagelime.configure do |config|
-  config.client_class = Pagelime::S3RailsCache
-end
-
-# start plugin 
-if Rails::VERSION::MAJOR == 2
-  require_relative 'rails/routing_extensions'
-  
-  ActionController::Routing::RouteSet::Mapper.send :include, ::Pagelime::Rails::RoutingExtensions
-  # below is not needed in Rails 2 as you can use the map.cms_routes from the routing_extensions
-  # require File.join(File.dirname(__FILE__), "/../config/routes.rb")
-  Pagelime::Rails::Initializer.initialize_pagelime_plugin
-elsif Rails::VERSION::MAJOR >= 3
-  require_relative 'rails/engine'
+module Pagelime
+  module Rails
+    module ClassMethods
+      def initialize!
+        
+        puts "PAGELIME CMS PLUGIN: initializing"
+        
+        app_path_relative = File.join('..', '..', 'app')
+        app_path = File.expand_path File.join(File.dirname(__FILE__), app_path_relative)
+        
+        # add dependencies to load paths
+        %w{ models controllers helpers }.each do |dir|
+          path = File.join(app_path, dir)
+          $LOAD_PATH << path
+          
+          if ::Rails::VERSION::MAJOR == 2
+            ActiveSupport::Dependencies.load_paths << path
+            ActiveSupport::Dependencies.load_once_paths.delete(path)
+          elsif ::Rails::VERSION::MAJOR >= 3
+            ActiveSupport::Dependencies.autoload_paths << path
+            ActiveSupport::Dependencies.autoload_once_paths.delete(path)
+          end
+        end
+        
+        # wire controller extensions
+        require_relative 'rails/controller_extensions'
+        ActionController::Base.extend ControllerExtensions
+        
+        # wire helper
+        require_relative File.join('.', app_path_relative, "helpers", "pagelime_helper")
+        ActionView::Base.send :include, PagelimeHelper
+        
+      end
+    end
+    
+    extend ClassMethods
+  end
 end

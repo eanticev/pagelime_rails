@@ -9,7 +9,7 @@ module Pagelime
     
       module InstanceMethods
         def cms_process_rendered_body
-          puts "PAGELIME CMS PLUGIN: Processing response body"
+          ::Rails.logger.debug "PAGELIME CMS RAILS PLUGIN: Processing response body in controller"
           
           # parse response body, cache, and use result as response body
           response.body = Pagelime.processor.process_document(response.body, request.path)

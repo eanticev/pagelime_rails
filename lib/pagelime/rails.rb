@@ -16,5 +16,5 @@ if Rails::VERSION::MAJOR == 2
   # require File.join(File.dirname(__FILE__), "/../config/routes.rb")
   Pagelime::Rails::Initializer.initialize_pagelime_plugin
 elsif Rails::VERSION::MAJOR >= 3
-  require_relative 'engine'
+  require_relative 'rails/engine'
 end

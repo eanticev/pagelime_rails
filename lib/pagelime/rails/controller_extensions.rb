@@ -2,7 +2,7 @@ module Pagelime
   module Rails
     module ControllerExtensions
     
-      def acts_as_cms_editable(opts=Hash.new)
+      def acts_as_cms_editable(opts = {})
         after_filter :cms_process_rendered_body, :except => opts[:except]
         include InstanceMethods
       end

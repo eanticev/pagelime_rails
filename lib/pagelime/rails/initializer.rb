@@ -1,5 +1,3 @@
-require_relative 'controller_extensions'
-
 module Pagelime
   module Rails
     module Initializer
@@ -16,20 +14,21 @@ module Pagelime
             path = File.join(app_path, dir)
             $LOAD_PATH << path
             
-            if Rails::VERSION::MAJOR == 2
+            if ::Rails::VERSION::MAJOR == 2
               ActiveSupport::Dependencies.load_paths << path
               ActiveSupport::Dependencies.load_once_paths.delete(path)
-            elsif Rails::VERSION::MAJOR >= 3
+            elsif ::Rails::VERSION::MAJOR >= 3
               ActiveSupport::Dependencies.autoload_paths << path
               ActiveSupport::Dependencies.autoload_once_paths.delete(path)
             end
           end
           
           # wire controller extensions
+          require_relative 'controller_extensions'
           ActionController::Base.extend ControllerExtensions
           
           # wire helper
-          require File.join(app_path_relative, "helpers", "pagelime_helper")
+          require_relative File.join('.', app_path_relative, "helpers", "pagelime_helper")
           ActionView::Base.send :include, PagelimeHelper
           
         end

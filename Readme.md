@@ -22,13 +22,13 @@ Getting Started
 * Pagelime account (either standalone [pagelime.com](http://pagelime.com) or via the [Pagelime Heroku add-on](https://addons.heroku.com/pagelime))
 * [Pagelime Rack gem](https://github.com/eanticev/pagelime_rack) (`pagelime-rack`)
 
-### Step 1: Install the Pagelime Rack gem
+### Step 1: Install the Pagelime Rails gem
 
 #### For Rails 2
 
 Edit your `config/environment.rb` file and add:
 
-    config.gem "pagelime_rails"
+    config.gem "pagelime-rails"
 
 then run
 
@@ -38,7 +38,7 @@ then run
 
 Edit your `Gemfile` and add
 
-    gem "pagelime-rack"
+    gem "pagelime-rails"
 
 then run
 

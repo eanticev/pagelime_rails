@@ -3,7 +3,7 @@ module Pagelime
     module ClassMethods
       def initialize!
         
-        puts "PAGELIME CMS PLUGIN: initializing"
+        ::Rails.logger.debug "PAGELIME CMS RAILS PLUGIN: initializing plugin"
         
         app_path_relative = File.join('..', '..', 'app')
         app_path = File.expand_path File.join(File.dirname(__FILE__), app_path_relative)
@@ -30,6 +30,14 @@ module Pagelime
         require_relative File.join('.', app_path_relative, "helpers", "pagelime_helper")
         ActionView::Base.send :include, PagelimeHelper
         
+        configure_pagelime!
+      end
+      
+      def configure_pagelime!
+        ::Pagelime.configure do |config|
+          config.client_class = ::Pagelime::S3RailsCache
+          config.logger       = ::Rails.logger
+        end
       end
     end
     

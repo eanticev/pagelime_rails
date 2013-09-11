@@ -67,6 +67,17 @@ You can pass an `:except` parameter just like with a filter like so:
 
     acts_as_cms_editable :except => :index
 
+Optionally, enable caching and logging:
+
+    Pagelime.configure do |config|
+      # object that responds to `fetch` and `delete`
+      config.cache = Rails.cache
+      # options passed to `fetch(key, options = {}, &block)`
+      config.cache_fetch_options = { :expires_in => 1.year }
+      # any standard logger
+      config.logger = Rails.logger
+    end
+
 #### Only for Rails 2.3.x
 
 Add the plugin routes to your `config/routes.rb` configuration:

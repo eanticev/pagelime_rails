@@ -5,19 +5,22 @@
 
 Gem::Specification.new do |s|
   s.name = "pagelime-rails"
-  s.version = "0.2.2"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Emil Anticevic", "Joel Van Horn"]
-  s.date = "2013-09-05"
+  s.date = "2013-09-11"
   s.description = ""
   s.email = "emil@pagelime.com"
+  s.extra_rdoc_files = [
+    "README.md"
+  ]
   s.files = [
     "Gemfile",
     "Heroku.md",
     "MIT-LICENSE",
+    "README.md",
     "Rakefile",
-    "Readme.md",
     "VERSION",
     "app/controllers/pagelime_receiver_controller.rb",
     "app/helpers/pagelime_helper.rb",
@@ -29,7 +32,6 @@ Gem::Specification.new do |s|
     "lib/pagelime/rails/controller_extensions.rb",
     "lib/pagelime/rails/engine.rb",
     "lib/pagelime/rails/routing_extensions.rb",
-    "lib/pagelime/s3_rails_cache.rb",
     "lib/tasks/pagelime.rake",
     "pagelime-rails.gemspec",
     "rails/init.rb",

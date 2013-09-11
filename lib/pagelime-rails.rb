@@ -1,7 +1,6 @@
 require 'pagelime-rack'
 require 'pagelime'
 require 'pagelime/rails'
-require 'pagelime/s3_rails_cache'
 
 Pagelime.logger.debug "PAGELIME CMS RAILS PLUGIN: pagelime-rails gem loaded"
 

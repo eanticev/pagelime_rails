@@ -35,8 +35,9 @@ module Pagelime
       
       def configure_pagelime!
         ::Pagelime.configure do |config|
-          config.client_class = ::Pagelime::S3RailsCache
-          config.logger       = ::Rails.logger
+          config.logger               = ::Rails.logger
+          config.cache                = ::Rails.cache
+          config.cache_fetch_options  = { :expires_in => 1.year }
         end
       end
     end

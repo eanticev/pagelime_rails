@@ -1,8 +1,5 @@
 # encoding: utf-8
 
-require 'yaml'
-YAML::ENGINE.yamler= 'syck'
-
 require 'rubygems'
 require 'bundler'
 begin

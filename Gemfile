@@ -2,7 +2,7 @@ source "http://rubygems.org"
 # Add dependencies required to use your gem here.
 # Example:
 
-gem 'pagelime-rack', '>= 0.3.0'
+gem 'pagelime-rack', '>= 0.4.3'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

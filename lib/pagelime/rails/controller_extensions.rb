@@ -12,7 +12,7 @@ module Pagelime
           ::Rails.logger.debug "PAGELIME CMS RAILS PLUGIN: Processing response body in controller"
           
           # tell pagelime-rack to parse response body, cache, and use result as response body
-          ::Rack::Pagelime.enable_processing_for_request(request.env)
+          ::Rack::Pagelime.enable_processing_for_request(request)
         end
       end
     

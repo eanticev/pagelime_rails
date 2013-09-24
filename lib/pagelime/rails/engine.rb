@@ -7,7 +7,7 @@ module Pagelime
       initializer "pagelime.initialize" do |app|
         ::Pagelime::Rails.initialize!
         
-        app.middleware.use Rack::Pagelime
+        app.middleware.insert_before Rack::ConditionalGet, Rack::Pagelime
       end
     end
   end

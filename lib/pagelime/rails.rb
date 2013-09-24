@@ -27,8 +27,8 @@ module Pagelime
         ActionController::Base.extend ControllerExtensions
         
         # wire helper
-        require_relative File.join('.', app_path_relative, "helpers", "pagelime_helper")
-        ActionView::Base.send :include, PagelimeHelper
+        require_relative 'rails/view_helper'
+        ActionView::Base.send :include, ViewHelper
         
         configure_pagelime!
       end

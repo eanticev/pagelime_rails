@@ -28,6 +28,9 @@ Gem::Specification.new do |s|
     "lib/pagelime/rails.rb",
     "lib/pagelime/rails/controller_extensions.rb",
     "lib/pagelime/rails/engine.rb",
+    "lib/pagelime/rails/view_helper.rb",
+    "lib/pagelime/rails2/controllers/pagelime_receiver_controller.rb",
+    "lib/pagelime/rails2/routing_extensions.rb",
     "lib/tasks/pagelime.rake",
     "pagelime-rails.gemspec",
     "rails/init.rb",
@@ -45,16 +48,16 @@ Gem::Specification.new do |s|
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<pagelime-rack>, [">= 0.4.2"])
+      s.add_runtime_dependency(%q<pagelime-rack>, [">= 0.4.3"])
       s.add_development_dependency(%q<bundler>, [">= 1.0.0"])
       s.add_development_dependency(%q<jeweler>, [">= 1.6.4"])
     else
-      s.add_dependency(%q<pagelime-rack>, [">= 0.4.2"])
+      s.add_dependency(%q<pagelime-rack>, [">= 0.4.3"])
       s.add_dependency(%q<bundler>, [">= 1.0.0"])
       s.add_dependency(%q<jeweler>, [">= 1.6.4"])
     end
   else
-    s.add_dependency(%q<pagelime-rack>, [">= 0.4.2"])
+    s.add_dependency(%q<pagelime-rack>, [">= 0.4.3"])
     s.add_dependency(%q<bundler>, [">= 1.0.0"])
     s.add_dependency(%q<jeweler>, [">= 1.6.4"])
   end

@@ -4,8 +4,9 @@ require 'pagelime/rails'
 
 Pagelime.logger.debug "PAGELIME CMS RAILS PLUGIN: pagelime-rails gem loaded"
 
-# start plugin 
-if Rails::VERSION::MAJOR == 2
+# Support Rails 2.3+
+
+if Rails::VERSION::MAJOR == 2 && Rails::VERSION::MINOR >= 3
   
   Pagelime::Rails.initialize!
   

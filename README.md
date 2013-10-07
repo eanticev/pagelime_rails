@@ -3,10 +3,11 @@ Pagelime Rails Plugin
 
 Easily add the Pagelime CMS to your Rails app.
 
-Pagelime is a simple CMS service that allows you to define editable regions in your content without installing any software on your site or app. 
-Simply add a `class="cms-editable"` to any HTML element, and log-in to the Pagelime CMS service to edit your content and images with a nice UI. 
+Pagelime is a simple CMS service that allows you to define editable regions in your pages without installing any software on your website or app. 
+Simply add a `class="cms-editable"` to any HTML element, and log-in to the Pagelime CMS service to edit your content and images with a nice, simple UI. 
 We host all of the code, content, and data until you publish a page. 
-When you publish a page, we pull the new content into your site/app dynamically via web APIs.
+When you publish a page, the PageLime CMS pushes the content to your website via secure FTP or an API. 
+Using the Rails plugin, we pull the new content into your app dynamically via an API.
 
 ### Quick Start (2 lines of code!)
 
@@ -133,7 +134,7 @@ Create some editable regions in your views like so:
 </div>
 ```
 
-*The ID and the class are required for the CMS to work*
+*The `ID` and the `class` are required for the CMS to work*
 
 Optionally: If you don't want to have your entire controller CMS editable for some reason, you can sorround areas in your view with a code block like so:
 

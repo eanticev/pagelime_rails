@@ -6,13 +6,27 @@ Easily add the Pagelime CMS to your Rails app.
 Pagelime is a simple CMS service that allows you to define editable regions in your content without installing any software on your site or app. 
 Simply add a `class="cms-editable"` to any HTML element, and log-in to the Pagelime CMS service to edit your content and images with a nice UI. 
 We host all of the code, content, and data until you publish a page. 
-When you publish a page, we push the content to your site/app via secure FTP or web APIs.
+When you publish a page, we pull the new content into your site/app dynamically via web APIs.
 
-One line example:
+### Quick Start (2 lines of code!)
 
-    <div id="my_content" class="cms-editable">
-      This content is now editable in Pagelime... no code... no databases... no fuss
-    </div>
+First, add the `cms-editable` class and an `id` to make content editable:
+
+```html
+<div id="my_content" class="cms-editable">
+  This content is now editable in Pagelime... no code... no databases... no fuss
+</div>
+```
+
+Second, add `acts_as_cms_editable` to your controller to display the latest content:
+
+```ruby
+class CmsPagesController < ApplicationController
+  acts_as_cms_editable
+end
+```
+
+Done!
 
 Getting Started
 ---------------
@@ -24,25 +38,35 @@ Getting Started
 
 ### Step 1: Install the Pagelime Rails gem
 
-#### For Rails 2
-
-Edit your `config/environment.rb` file and add:
-
-    config.gem "pagelime-rails"
-
-then run
-
-    rake gems:install
-
 #### For Rails 3
 
 Edit your `Gemfile` and add
 
-    gem "pagelime-rails"
+```ruby
+gem "pagelime-rack"
+gem "pagelime-rails"
+```
 
 then run
 
-    bundle install
+```bash
+bundle install
+```
+
+#### For Rails 2 (not officially supported)
+
+Edit your `config/environment.rb` file and add:
+
+```ruby
+config.gem "pagelime-rack"
+config.gem "pagelime-rails"
+```
+
+then run
+
+```bash
+rake gems:install
+```
 
 ### Step 2: Setup your Pagelime credentials
 
@@ -55,38 +79,45 @@ Make sure that the "Integration Method" for your site on the advanced tab is set
 
 For any controller that renders views that you want editable, add the `acts_as_cms_editable` behavior like so:
 
-    class CmsPagesController < ApplicationController
-      # attach the cms behavior to the controller
-      acts_as_cms_editable
-    
-      def index
-      end
-    end
+```ruby
+class CmsPagesController < ApplicationController
+  # attach the cms behavior to the controller
+  acts_as_cms_editable
+
+  def index
+  end
+end
+```
 
 You can pass an `:except` parameter just like with a filter like so:
 
-    acts_as_cms_editable :except => :index
+```ruby
+acts_as_cms_editable :except => :index
+```
 
-Optionally, enable caching and logging:
+Caching and logging are automatically setup using your Rails configuration. 
+You can specify custom caching and logging by adding the following to an initializer file.
 
-    Pagelime.configure do |config|
-      # object that responds to `fetch` and `delete`
-      config.cache = Rails.cache
-      # options passed to `fetch(key, options = {}, &block)`
-      config.cache_fetch_options = { :expires_in => 1.year }
-      # any standard logger
-      config.logger = Rails.logger
-    end
+```ruby
+Pagelime.configure do |config|
 
-#### Only for Rails 2.3.x
+  # object that responds to `fetch` and `delete`
+  config.cache = Rails.cache
+  
+  # options passed to `fetch(key, options = {}, &block)`
+  config.cache_fetch_options = { :expires_in => 1.year }
+  
+  # any standard logger
+  config.logger = Rails.logger
+  
+end
+```
 
-Add the plugin routes to your `config/routes.rb` configuration:
+*It is highly recommended that you enable server caching to reduce latency on each request when retrieving CMS content. [MemCachier](https://www.memcachier.com/) has a great [Heroku addon](https://addons.heroku.com/memcachier) for caching if you don't have caching configured.*
 
-    map.cms_routes
+#### Rack Middleware
 
-These routes are used by Pagelime to clear any caches after save and publish events on your files.
-
-*Rails 3 does not need this statement, as the plugin will behave as an engine*
+The `Rack::Pagelime` middleware is inserted before `Rack::ConditionalGet` to retrieve CMS content before HTTP caching is performed.
 
 #### Additional configuration options
 
@@ -96,19 +127,23 @@ These routes are used by Pagelime to clear any caches after save and publish eve
 
 Create some editable regions in your views like so:
 
-    <div id="my_content" class="cms-editable">
-      this is now editable
-    </div>
+```html
+<div id="my_content" class="cms-editable">
+  this is now editable
+</div>
+```
 
 *The ID and the class are required for the CMS to work*
 
 Optionally: If you don't want to have your entire controller CMS editable for some reason, you can sorround areas in your view with a code block like so:
 
-    <% cms_content do %>
-      <div id="my_content" class="cms-editable">
-        hello world
-      </div>
-    <% end %>
+```rhtml
+<% cms_content do %>
+  <div id="my_content" class="cms-editable">
+    hello world
+  </div>
+<% end %>
+```
 
 ### Step 5: Edit your pages!
 

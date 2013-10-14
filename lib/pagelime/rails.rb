@@ -17,11 +17,24 @@ module Pagelime
       end
       
       def configure_pagelime!
+        assets = Rails.application.confi.assets
+        
         ::Pagelime.configure do |config|
           config.toggle_processing    = "per_request"
           config.logger               = ::Rails.logger
-          config.cache                = ::Rails.cache
           config.cache_fetch_options  = { :expires_in => 1.year }
+          config.cache                = ::Rails.cache
+          
+          if assets.enabled == true
+            
+            # fallback on asset logger if available
+            config.logger ||= assets.logger if assets.logger != false
+            
+            # fallback on asset cache_store if available
+            config.cache ||= ActiveSupport::Cache.lookup_store(assets.cache_store) if assets.cache_store != false
+            
+          end
+          
         end
       end
     end

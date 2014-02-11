@@ -17,7 +17,7 @@ module Pagelime
       end
       
       def configure_pagelime!
-        assets = Rails.application.confi.assets
+        assets = ::Rails.application.config.assets
         
         ::Pagelime.configure do |config|
           config.toggle_processing    = "per_request"
